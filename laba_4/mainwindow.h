@@ -56,6 +56,8 @@ private:
     void drawBresenhamLine(QPainter &painter);
     void drawBresenhamCircle(QPainter &painter);
         void drawBresenhamCircle2(QPainter &painter);
+            void drawCastle(QPainter &painter);
+
     void drawSmoothedPoints(QPainter &painter, int centerX, int centerY, int x, int y);
 
     bool isFullScreen;

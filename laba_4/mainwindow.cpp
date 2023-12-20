@@ -308,6 +308,12 @@ void MainWindow::paintEvent(QPaintEvent *event) {
         painter.setFont(font);
         //painter.drawText(textRect, Qt::AlignCenter, "Алгоритм Брезенхема (окружность)");
         break;
+    case 5:
+        drawCastle(painter);
+        font.setPointSize(12);
+        painter.setFont(font);
+        //painter.drawText(textRect, Qt::AlignCenter, "Алгоритм Брезенхема (окружность)");
+        break;
     default:
         break;
     }
@@ -315,7 +321,7 @@ void MainWindow::paintEvent(QPaintEvent *event) {
 
 
 void MainWindow::drawNextAlgorithm() {
-    currentAlgorithm = (currentAlgorithm + 1) % 5;
+    currentAlgorithm = (currentAlgorithm + 1) % 6;
 
     const int numIterations = 10; // Количество итераций для усреднения времени выполнения
     qint64 totalNanoSeconds = 0;
@@ -343,7 +349,7 @@ void MainWindow::drawNextAlgorithm() {
 }
 
 void MainWindow::drawPrevAlgorithm() {
-    currentAlgorithm = (currentAlgorithm - 1 + 5) % 5; // Обратный переход на предыдущий алгоритм
+    currentAlgorithm = (currentAlgorithm - 1 + 6) % 6; // Обратный переход на предыдущий алгоритм
 
     const int numIterations = 10; // Количество итераций для усреднения времени выполнения
     qint64 totalNanoSeconds = 0;
@@ -379,10 +385,11 @@ void MainWindow::drawStepByStepLine(QPainter &painter) {
     int centerX = windowWidth / 2;
     int centerY = windowHeight / 2;
 
-    int x1 = centerX - 250; // Начальная точка смещена на 150 пикселей влево от центра по x
-    int y1 = centerY - 150; // Начальная точка смещена на 100 пикселей вверх от центра по y
+    int x1 = centerX + 10; // Начальная точка смещена на 150 пикселей влево от центра по x
+    int y1 = centerY - 10; // Начальная точка смещена на 100 пикселей вверх от центра по y
     int x2 = centerX + 250; // Конечная точка смещена на 150 пикселей вправо от центра по x
-    int y2 = centerY + 150; // Конечная точка смещена на 100 пикселей вниз от центра по y
+    int y2 = centerY - 150; // Конечная точка смещена на 50 пикселей вниз от центра по y
+    /////////////////////////////////////
 
     // разница между начальными и конечными точками
     int dx = x2 - x1;
@@ -446,11 +453,11 @@ void MainWindow::drawDDALine(QPainter &painter) {
     int centerX = width / 2;
     int centerY = height / 2;
 
-    int x1 = centerX - 250; // Начальная точка смещена на 150 пикселей влево от центра по x
-    int y1 = centerY - 150; // Начальная точка смещена на 100 пикселей вверх от центра по y
+    int x1 = centerX + 10; // Начальная точка смещена на 150 пикселей влево от центра по x
+    int y1 = centerY - 10; // Начальная точка смещена на 100 пикселей вверх от центра по y
     int x2 = centerX + 250; // Конечная точка смещена на 150 пикселей вправо от центра по x
-    int y2 = centerY + 150; // Конечная точка смещена на 50 пикселей вниз от центра по y
-
+    int y2 = centerY - 150; // Конечная точка смещена на 50 пикселей вниз от центра по y
+    /////////////////////////////////////
     int dx = x2 - x1;
     int dy = y2 - y1;
 
@@ -499,6 +506,147 @@ void MainWindow::drawDDALine(QPainter &painter) {
     painter.drawLine(x1, y1, x2, y2);
 }
 
+
+
+void MainWindow::drawCastle(QPainter &painter) {
+    basic_info->show();
+    int width = 800;
+    int height = 500;
+
+    int centerX = width / 2;
+    int centerY = height / 2;
+
+    int x1 = centerX + 10; // Начальная точка смещена на 150 пикселей влево от центра по x
+    int y1 = centerY - 10; // Начальная точка смещена на 100 пикселей вверх от центра по y
+    int x2 = centerX + 250; // Конечная точка смещена на 150 пикселей вправо от центра по x
+    int y2 = centerY - 150; // Конечная точка смещена на 50 пикселей вниз от центра по y
+    /////////////////////////////////////
+
+
+    // Вычисляем разности координат
+    int dx = x2 - x1;
+    int dy = y2 - y1;
+
+    int m1 = 1, m2 = 2;
+
+    int k = centerY - 150;
+    int y = centerY - k;
+    int x = 250 - (centerY - k);
+
+    int check_m1 = 10;
+    int check_m2 = 10;
+    // Сравниваем x и y
+    while (x != y) {
+        if (x > y) {
+        // Уточняем верхнее приближение m2 и переменную x
+        m2 += (m1 * check_m2);
+        check_m2 *= check_m1;
+        x = x - y;
+        } else {
+        // Уточняем нижнее приближение m1 и переменную y
+        m1 += (m2 * check_m1);
+        check_m1 *= check_m2;
+        y = y - x;
+        }
+    }
+
+    int m11 = 0;
+    int check = check_m1 / 10;
+    while (m1 % 10 != 0)
+    {
+        m11 += (m1 % 10) * check;
+        check /= 10;
+        m1 /= 10;
+    }
+
+    // Окончательный результат
+    int m = (m2 * check_m1) + m11;
+
+    int kk = m;
+    m *= check_m1;
+    m*= check_m2;
+    m+= kk;
+
+    // Рисуем отрезок
+    int currentX = x2;
+    int currentY = y2;
+
+    painter.setPen(Qt::darkBlue); // Установка цвета линии
+
+    int pointRadius = 3; // Задайте радиус точки здесь
+    // Установка стиля пера для рисования точки
+    QPen pen = painter.pen();
+    pen.setCapStyle(Qt::RoundCap);
+    pen.setWidth(pointRadius); // Устанавливаем ширину пера равную двойному радиусу точки
+    painter.setPen(pen);
+
+    painter.drawPoint(x1, y1);
+
+    int curX = 0;
+    int curY = 0;
+
+    while (currentX >= x1 && currentY <= y1) {
+        //drawPixel(painter, currentX, currentY);
+        int pointRadius = 4; // Задайте радиус точки здесь
+        // Установка стиля пера для рисования точки
+        painter.setPen(Qt::darkBlue);
+        QPen pen = painter.pen();
+        pen.setCapStyle(Qt::RoundCap);
+        pen.setWidth(pointRadius); // Устанавливаем ширину пера равную двойному радиусу точки
+        painter.setPen(pen);
+        painter.drawPoint(round(currentX), round(currentY));
+        curX = currentX;
+        curY = currentY;
+        if (m % 10 == 1)
+        {
+        currentX -= 25;
+        m /= 10;
+        }
+        else
+        {
+        currentX -= 25;
+        currentY += 25;
+        m /= 10;
+        }
+
+        if (currentX >= x1)
+        {
+        painter.setPen(QPen(Qt::black, 2));
+        painter.drawLine(curX, curY, currentX, currentY);
+        }
+        if (currentX < x1)
+        {
+        painter.setPen(QPen(Qt::black, 2));
+        painter.drawLine(curX, curY, x1, y1);
+        }
+    }
+
+    std::cout<< "M1:::" <<currentX << ":M2:" << currentX << "....." ;
+    ///////////////////////////////////
+
+    QString values = "X1: " + QString::number(x1) +
+                     ", Y1: " + QString::number(y1) +
+                     ", X2: " + QString::number(x2) +
+                     ", Y2: " + QString::number(y2);
+
+    // Подписи значений
+    basic_info->setText(values);
+    basic_info->setGeometry(10, 0, 200, 35);
+    QFont font("Bookman Old Style", 8);
+    basic_info->setFont(font);
+    basic_info->show();
+
+    names->setText("Castle-Pitway");
+    names->setAlignment(Qt::AlignCenter);
+    names->setGeometry(250, 450, 300, 25);
+    names->setFont(font);
+    names->show();
+
+    painter.setPen(QPen(Qt::black, 0.1));
+    painter.drawLine(x1, y1, x2, y2);
+}
+
+
 void MainWindow::drawBresenhamLine(QPainter &painter) {
     int width = 800;
     int height = 500;
@@ -506,10 +654,11 @@ void MainWindow::drawBresenhamLine(QPainter &painter) {
     int centerX = width / 2;
     int centerY = height / 2;
 
-    int x1 = centerX - 250; // Начальная точка смещена на 150 пикселей влево от центра по x
-    int y1 = centerY - 150; // Начальная точка смещена на 100 пикселей вверх от центра по y
+    int x1 = centerX + 10; // Начальная точка смещена на 150 пикселей влево от центра по x
+    int y1 = centerY - 10; // Начальная точка смещена на 100 пикселей вверх от центра по y
     int x2 = centerX + 250; // Конечная точка смещена на 150 пикселей вправо от центра по x
-    int y2 = centerY + 150; // Конечная точка смещена на 50 пикселей вниз от центра по y
+    int y2 = centerY - 150; // Конечная точка смещена на 50 пикселей вниз от центра по y
+    /////////////////////////////////////
 
 
     painter.setPen(QPen(Qt::black, 0.1));
